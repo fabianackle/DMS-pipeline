@@ -63,6 +63,32 @@ process Align {
     """
 }
 
+process Subsample {
+    tag "samtools view on $big_bam"
+
+    publishDir params.outdir, mode: 'copy'
+
+    input:
+    path big_bam
+
+    output:
+    path "${big_bam.baseName}_subsampled.bam"
+
+    script:
+    """
+    samtools view -@ $task.cpus \
+        --subsample 0.01 --subsample-seed 123 \
+        -b -o "${big_bam.baseName}_temp.bam" \
+        $big_bam
+
+    samtools sort -@ $task.cpus \
+        "${big_bam.baseName}_temp.bam" \
+        -o "${big_bam.baseName}_subsampled.bam"
+
+    rm "${big_bam.baseName}_temp.bam"
+    """
+}
+
 /* Workflow */
 workflow {
     Channel
@@ -73,4 +99,5 @@ workflow {
         .set { wt_sequence_ch }
     trimmed_ch = RemoveAdapter(read_pairs_ch)
     align_ch = Align(wt_sequence_ch, trimmed_ch)
+    Subsample(align_ch)
 }
