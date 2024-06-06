@@ -3,3 +3,5 @@ data
 work
 .DS_Store
 .nextflow.log*
+report*.html
+timeline*.html
