@@ -40,8 +40,7 @@ process Align {
     tag "BWA on $sample_id"
 
     input:
-    path(wt_sequence)
-    tuple val(sample_id), path(trimmed_sequence_1), path(trimmed_sequence_2)
+    tuple path(wt_sequence), val(sample_id), path(trimmed_sequence_1), path(trimmed_sequence_2)
 
     output:
     path "${sample_id}_adaptor_removed_trimmed.raw.bam"
@@ -98,6 +97,7 @@ workflow {
         .fromPath(params.wt_sequence, checkIfExists: true)
         .set { wt_sequence_ch }
     trimmed_ch = RemoveAdapter(read_pairs_ch)
-    align_ch = Align(wt_sequence_ch, trimmed_ch)
+    align_input_ch = wt_sequence_ch.combine(trimmed_ch)
+    align_ch = Align(align_input_ch)
     Subsample(align_ch)
 }
