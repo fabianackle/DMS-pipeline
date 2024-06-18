@@ -17,6 +17,7 @@ log.info """
 
 /* Processes */
 process RemoveAdapter {
+    conda "bioconda::cutadapt=4.8"
     tag "Cutadapt on $sample_id"
 
     input:
@@ -37,6 +38,7 @@ process RemoveAdapter {
 }
 
 process Align {
+    conda "bioconda::bwa=0.7.18 bioconda::samtools=1.20"
     tag "BWA on $sample_id"
 
     input:
@@ -63,6 +65,7 @@ process Align {
 }
 
 process Subsample {
+    conda "bioconda::samtools=1.20"
     tag "samtools view on $big_bam"
 
     publishDir params.outdir, mode: 'copy'
