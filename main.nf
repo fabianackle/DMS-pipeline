@@ -92,6 +92,7 @@ process Subsample {
 }
 
 process Analysis_DMS {
+    cpus 1
     conda "DMS_ABC.yml"
     tag "DMS_ABC on $bam"
 
