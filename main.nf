@@ -3,7 +3,7 @@
 /* Define parameters */
 params.reads = "$projectDir/data/*_R{1,2}_*"
 params.wt_sequence = "$projectDir/data/EfrEF_opt_wt_sequence.fa"
-params.outdir = "results"
+params.outdir = "$projectDir/results"
 
 /* Print pipeline info */
 log.info """
