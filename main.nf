@@ -48,7 +48,7 @@ process Align {
     tuple path(wt_sequence), val(sample_id), path(trimmed_sequence_1), path(trimmed_sequence_2)
 
     output:
-    path "${sample_id}_adaptor_removed_trimmed.raw.bam"
+    tuple val(sample_id), path("${sample_id}_adaptor_removed_trimmed.raw.sam")
 
     script:
     """
@@ -58,12 +58,25 @@ process Align {
         $wt_sequence \
         $trimmed_sequence_1 $trimmed_sequence_2 \
         > ${sample_id}_adaptor_removed_trimmed.raw.sam
+    """
+}
 
+process Sort {
+    cpus 4
+    conda "bioconda::samtools=1.20"
+    tag "Samtools on $sample_id"
+
+    input:
+    tuple val(sample_id), path(aligned_sam)
+
+    output:
+    path("${sample_id}_adaptor_removed_trimmed.raw.bam")
+
+    script:
+    """
     samtools sort -@ $task.cpus \
-        ${sample_id}_adaptor_removed_trimmed.raw.sam \
+        $aligned_sam \
         -o ${sample_id}_adaptor_removed_trimmed.raw.bam
-
-    rm ${sample_id}_adaptor_removed_trimmed.raw.sam
     """
 }
 
@@ -132,9 +145,11 @@ workflow {
         .set { wt_sequence_ch }
     trimmed_ch = RemoveAdapter(read_pairs_ch)
     align_input_ch = wt_sequence_ch.combine(trimmed_ch)
-    align_ch = Align(align_input_ch)
-    subsample_ch = Subsample(align_ch)
+    aligned_ch = Align(align_input_ch)
+    sorted_ch = Sort(aligned_ch)
+    //subsample_ch = Subsample(sorted_ch)
     //dms_abc_input_ch = wt_sequence_ch.combine(subsample_ch)
-    dms_abc_input_ch = wt_sequence_ch.combine(align_ch)
-    Analysis_DMS(dms_abc_input_ch)
+    dms_abc_input_ch = wt_sequence_ch.combine(sorted_ch)
+    dms_abc_input_ch.view()
+    //Analysis_DMS(dms_abc_input_ch)
 }
