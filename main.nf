@@ -41,7 +41,7 @@ process RemoveAdapter {
 
 process Align {
     cpus 4
-    conda "bioconda::bwa=0.7.18 bioconda::samtools=1.20"
+    conda "bioconda::bwa-mem2=2.2.1"
     tag "BWA on $sample_id"
 
     input:
@@ -52,9 +52,9 @@ process Align {
 
     script:
     """
-    bwa index $wt_sequence
+    bwa-mem2 index $wt_sequence
 
-    bwa mem -t $task.cpus \
+    bwa-mem2 mem -t $task.cpus \
         $wt_sequence \
         $trimmed_sequence_1 $trimmed_sequence_2 \
         > ${sample_id}_adaptor_removed_trimmed.raw.sam
