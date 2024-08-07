@@ -17,6 +17,7 @@ log.info """
 
 /* Processes */
 process RemoveAdapter {
+    errorStrategy 'ignore'
     cpus 4
     conda "bioconda::cutadapt=4.8"
     tag "Cutadapt on $sample_id"
