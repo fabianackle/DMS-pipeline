@@ -18,7 +18,7 @@ log.info """
 /* Processes */
 process RemoveAdapter {
     errorStrategy 'ignore'
-    cpus 4
+    cpus 8
     conda "bioconda::cutadapt=4.8"
     tag "Cutadapt on $sample_id"
 
@@ -40,7 +40,7 @@ process RemoveAdapter {
 }
 
 process Align {
-    cpus 4
+    cpus 8
     conda "bioconda::bwa-mem2=2.2.1"
     tag "BWA on $sample_id"
 
@@ -62,7 +62,7 @@ process Align {
 }
 
 process Sort {
-    cpus 4
+    cpus 8
     conda "bioconda::samtools=1.20"
     tag "Samtools on $sample_id"
 
@@ -81,7 +81,7 @@ process Sort {
 }
 
 process Subsample {
-    cpus 2
+    cpus 8
     conda "bioconda::samtools=1.20"
     tag "samtools view on $big_bam"
 
