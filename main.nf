@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 
 /* Define parameters */
-params.reads = "$projectDir/data/*_R{1,2}_*"
+params.reads = "$projectDir/data/*_R{1,2}*.fastq.gz"
 params.wt_sequence = "$projectDir/data/EfrEF_opt_wt_sequence.fa"
 params.outdir = "$projectDir/results"
 
