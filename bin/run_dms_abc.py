@@ -8,7 +8,8 @@ import dnaio
 
 import codon_truncation_bam_overlap
 import counter
-import create_count_file
+#import create_count_file
+import create_count_file_stand_alone_onlymutcod_wt_spike_efref_NNK
 
 
 def parse_arguments():
@@ -17,6 +18,8 @@ def parse_arguments():
     parser.add_argument("--bam")
     parser.add_argument("--reference")  # reference fasta file
     parser.add_argument("--positions", nargs='+', type=int)  # list codons to be analyzed
+    parser.add_argument("--wt_ref_position")
+    parser.add_argument("--wt_codon")
     parser.add_argument("--readingframes", action='store_true')  # bool multiple reading frames
     parser.add_argument("--frameshift_position", default=0, type=int)
     parser.add_argument("--frameshift_offset", default=0, type=int)
@@ -51,12 +54,16 @@ def DMS_processing(parameters):
     reference_name = parameters["reference_name"]
     reference_sequence = parameters["reference_sequence"]
     positions = parameters["positions"]
+    wt_ref_position = parameters["wt_ref_position"]
+    wt_codon = parameters["wt_codon"]
 
     codon_truncation_bam_overlap.codon_truncation(input_file, codontruncated_file, frameshift_position, frameshift_offset, reference_name)
 
     counter.count_mutants(codontruncated_file, triplet_count_file, positions, reference_name, reference_sequence)
 
-    create_count_file.make_HDF5(triplet_count_file, reference_sequence, frameshift_position, frameshift_offset)
+    #create_count_file.make_HDF5(triplet_count_file, reference_sequence, frameshift_position, frameshift_offset)
+
+    create_count_file_stand_alone_onlymutcod_wt_spike_efref_NNK.make_HDF5(triplet_count_file, reference_sequence, frameshift_position, frameshift_offset, wt_ref_position, wt_codon)
 
 
 def main():
@@ -69,6 +76,8 @@ def main():
         'reference_name': reference_name,
         'reference_sequence': reference_sequence,
         'positions': args.positions,
+        'wt_ref_position': args.wt_ref_position,
+        'wt_codon': args.wt_codon,
         'readingframes': args.readingframes,
         'frameshift_position': args.frameshift_position,
         'frameshift_offset': args.frameshift_offset
