@@ -128,7 +128,7 @@ def make_HDF5(input_file, reference_sequence, frameshift_position, frameshift_of
     print(data_frame)
     data_frame.to_csv(input_file + 'test.csv')
     output_HDF5_frame1 = open(input_file + '_readingframe_1_HDF5.csv', 'w')
-    output_HDF5_frame2 = open(input_file + '_readingframe_1_HDF5.csv', 'w')
+    output_HDF5_frame2 = open(input_file + '_readingframe_2_HDF5.csv', 'w')
     column_list = list(data_frame)[1:65]
     # create a list of reference positions from data frame
     reference_positions = list(data_frame.iloc[:, 0])
