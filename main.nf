@@ -83,7 +83,7 @@ process Sort {
 process Subsample {
     cpus 8
     conda "bioconda::samtools=1.20"
-    tag "samtools view on $big_bam"
+    tag "Samtools view on $big_bam"
 
     publishDir params.outdir, mode: 'copy'
 
