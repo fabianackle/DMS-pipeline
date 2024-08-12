@@ -114,16 +114,16 @@ def read_csv_pandas(path_to_tsv):
     return pd.read_table(path_to_tsv, header=0)
 
 
-def make_HDF5(input_file, reference_sequence, frameshift_position, frameshift_offset, wt_ref_position, wt_codon):
+def make_HDF5(input_file, reference_sequence, frameshift_position, frameshift_offset, wt_ref_position, wt_codon, wt_count):
     data_frame = read_csv_pandas(input_file)
     print(data_frame)
     for AA in data_frame.columns[1:65]:
         for row in data_frame.index:
 
             if row in row_nnk:
-                if AA not in mut_codon_list_nnk and data_frame.loc[row, AA] < 30000:
+                if AA not in mut_codon_list_nnk and data_frame.loc[row, AA] < wt_count:
                     data_frame.loc[row, AA] = 0
-            elif AA not in mut_codon_list and data_frame.loc[row, AA] < 30000:
+            elif AA not in mut_codon_list and data_frame.loc[row, AA] < wt_count:
                 data_frame.loc[row, AA] = 0
     print(data_frame)
     data_frame.to_csv(input_file + 'test.csv')

@@ -20,6 +20,7 @@ def parse_arguments():
     parser.add_argument("--positions", nargs='+', type=int)  # list codons to be analyzed
     parser.add_argument("--wt_ref_position")
     parser.add_argument("--wt_codon")
+    parser.add_argument("--wt_count", default=10000, type=int)
     parser.add_argument("--readingframes", action='store_true')  # bool multiple reading frames
     parser.add_argument("--frameshift_position", default=0, type=int)
     parser.add_argument("--frameshift_offset", default=0, type=int)
@@ -56,6 +57,7 @@ def DMS_processing(parameters):
     positions = parameters["positions"]
     wt_ref_position = parameters["wt_ref_position"]
     wt_codon = parameters["wt_codon"]
+    wt_count = parameters["wt_count"]
 
     codon_truncation_bam_overlap.codon_truncation(input_file, codontruncated_file, frameshift_position, frameshift_offset, reference_name)
 
@@ -63,7 +65,7 @@ def DMS_processing(parameters):
 
     #create_count_file.make_HDF5(triplet_count_file, reference_sequence, frameshift_position, frameshift_offset)
 
-    create_count_file_stand_alone_onlymutcod_wt_spike_efref_NNK.make_HDF5(triplet_count_file, reference_sequence, frameshift_position, frameshift_offset, wt_ref_position, wt_codon)
+    create_count_file_stand_alone_onlymutcod_wt_spike_efref_NNK.make_HDF5(triplet_count_file, reference_sequence, frameshift_position, frameshift_offset, wt_ref_position, wt_codon, wt_count)
 
 
 def main():
@@ -78,6 +80,7 @@ def main():
         'positions': args.positions,
         'wt_ref_position': args.wt_ref_position,
         'wt_codon': args.wt_codon,
+        'wt_count': args.wt_count,
         'readingframes': args.readingframes,
         'frameshift_position': args.frameshift_position,
         'frameshift_offset': args.frameshift_offset
