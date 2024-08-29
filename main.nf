@@ -19,8 +19,8 @@ log.info """
 process RemoveAdapter {
     errorStrategy 'ignore'
     cpus 8
-    memory '2 GB'
-    time '1h'
+    memory '1 GB'
+    time '15m'
     conda "bioconda::cutadapt=4.8"
     tag "Cutadapt on $sample_id"
 
@@ -43,8 +43,8 @@ process RemoveAdapter {
 
 process Align {
     cpus 8
-    memory '4 GB'
-    time '1h'
+    memory '2 GB'
+    time '30m'
     conda "bioconda::bwa-mem2=2.2.1"
     tag "BWA on $sample_id"
 
@@ -66,9 +66,9 @@ process Align {
 }
 
 process Sort {
-    cpus 8
-    memory '16 GB'
-    time '1h'
+    cpus 2
+    memory '8 GB'
+    time '30m'
     conda "bioconda::samtools=1.20"
     tag "Samtools on $sample_id"
 
@@ -116,8 +116,8 @@ process Subsample {
 
 process Analysis_DMS {
     cpus 1
-    memory '4 GB'
-    time '4h'
+    memory '1 GB'
+    time '1h'
     conda "DMS_ABC.yml"
     tag "DMS_ABC on $bam"
 
