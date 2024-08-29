@@ -86,6 +86,31 @@ process Sort {
     """
 }
 
+process AlignSort {
+    cpus 8
+    memory '8 GB'
+    time '1h'
+    conda "bioconda::bwa-mem2=2.2.1 bioconda::samtools=1.20"
+    tag "BWA and samtools on $sample_id"
+
+    input:
+    tuple path(wt_sequence), val(sample_id), path(trimmed_sequence_1), path(trimmed_sequence_2)
+
+    output:
+    tuple val(sample_id), path("${sample_id}_adaptor_removed_trimmed.raw.bam")
+
+    script:
+    """
+    bwa-mem2 index $wt_sequence
+
+    bwa-mem2 mem -t $task.cpus \
+        $wt_sequence \
+        $trimmed_sequence_1 $trimmed_sequence_2 \
+        | samtools sort -@ $task.cpus \
+        -o ${sample_id}_adaptor_removed_trimmed.raw.bam
+    """    
+}
+
 process Subsample {
     cpus 8
     conda "bioconda::samtools=1.20"
@@ -156,8 +181,9 @@ workflow {
         .set { wt_sequence_ch }
     trimmed_ch = RemoveAdapter(read_pairs_ch)
     align_input_ch = wt_sequence_ch.combine(trimmed_ch)
-    aligned_ch = Align(align_input_ch)
-    sorted_ch = Sort(aligned_ch)
+    //aligned_ch = Align(align_input_ch)
+    //sorted_ch = Sort(aligned_ch)
+    sorted_ch = AlignSort(align_input_ch)
     //subsample_ch = Subsample(sorted_ch)
     //dms_abc_input_ch = wt_sequence_ch.combine(subsample_ch)
     dms_abc_input_ch = wt_sequence_ch.combine(sorted_ch)
