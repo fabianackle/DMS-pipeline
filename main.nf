@@ -97,7 +97,7 @@ process AlignSort {
     tuple path(wt_sequence), val(sample_id), path(trimmed_sequence_1), path(trimmed_sequence_2)
 
     output:
-    tuple val(sample_id), path("${sample_id}_adaptor_removed_trimmed.raw.bam")
+    path("${sample_id}_adaptor_removed_trimmed.raw.bam")
 
     script:
     """
