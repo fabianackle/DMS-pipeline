@@ -66,8 +66,8 @@ process Align {
 }
 
 process Sort {
-    cpus 2
-    memory '8 GB'
+    cpus 4
+    memory '4 GB'
     time '30m'
     conda "bioconda::samtools=1.20"
     tag "Samtools on $sample_id"
