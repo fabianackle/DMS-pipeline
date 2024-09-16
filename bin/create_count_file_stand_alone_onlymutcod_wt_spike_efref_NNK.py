@@ -141,7 +141,6 @@ def make_HDF5(input_file, reference_sequence, frameshift_position, frameshift_of
 
     wt_counter1 = 0
     wt_counter2 = 0
-    rev_wt1 = 0
 # for each reference position in the reference position list determine referenceposition index, codon and
     for ref in reference_positions:
         # define parameters for one position to be analyzed
@@ -177,8 +176,8 @@ def make_HDF5(input_file, reference_sequence, frameshift_position, frameshift_of
                         else:
                             output_HDF5_frame2.write(write_HGVS5_format_position(1, ref_pos - frameshift_position - frameshift_offset, ref_codon, i) + '\t' + str(data_frame.loc[ref_ind, i]) + '\n')
 
-    output_HDF5_frame1.write('_wt' + '\t' + str(rev_wt1))
-    output_HDF5_frame2.write('_wt' + '\t' + str(rev_wt1))
+    output_HDF5_frame1.write('_wt' + '\t' + str(wt_counter1))
+    output_HDF5_frame2.write('_wt' + '\t' + str(wt_counter2))
 
     output_HDF5_frame1.close()
     output_HDF5_frame1.close()
