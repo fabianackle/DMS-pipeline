@@ -180,4 +180,4 @@ def make_HDF5(input_file, reference_sequence, frameshift_position, frameshift_of
     output_HDF5_frame2.write('_wt' + '\t' + str(wt_counter2))
 
     output_HDF5_frame1.close()
-    output_HDF5_frame1.close()
+    output_HDF5_frame2.close()
