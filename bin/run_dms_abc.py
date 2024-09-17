@@ -18,6 +18,7 @@ def parse_arguments():
     parser.add_argument("--bam")
     parser.add_argument("--reference")  # reference fasta file
     parser.add_argument("--positions", nargs='+', type=int)  # list codons to be analyzed
+    parser.add_argument("--nnk_positions", nargs='+', type=int)
     parser.add_argument("--wt_ref_position")
     parser.add_argument("--wt_codon")
     parser.add_argument("--wt_count", default=10000, type=int)
@@ -55,6 +56,7 @@ def DMS_processing(parameters):
     reference_name = parameters["reference_name"]
     reference_sequence = parameters["reference_sequence"]
     positions = parameters["positions"]
+    nnk_positions = parameters["nnk_positions"]
     wt_ref_position = parameters["wt_ref_position"]
     wt_codon = parameters["wt_codon"]
     wt_count = parameters["wt_count"]
@@ -65,7 +67,7 @@ def DMS_processing(parameters):
 
     #create_count_file.make_HDF5(triplet_count_file, reference_sequence, frameshift_position, frameshift_offset)
 
-    create_count_file_stand_alone_onlymutcod_wt_spike_efref_NNK.make_HDF5(triplet_count_file, reference_sequence, frameshift_position, frameshift_offset, wt_ref_position, wt_codon, wt_count)
+    create_count_file_stand_alone_onlymutcod_wt_spike_efref_NNK.make_HDF5(triplet_count_file, reference_sequence, frameshift_position, frameshift_offset, nnk_positions, wt_ref_position, wt_codon, wt_count)
 
 
 def main():
@@ -78,6 +80,7 @@ def main():
         'reference_name': reference_name,
         'reference_sequence': reference_sequence,
         'positions': args.positions,
+        'nnk_positions': args.nnk_positions,
         'wt_ref_position': args.wt_ref_position,
         'wt_codon': args.wt_codon,
         'wt_count': args.wt_count,

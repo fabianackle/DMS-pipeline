@@ -60,7 +60,6 @@ AA_CODES = {
 
 mut_codon_list = ['GCT', 'TGT', 'GAT', 'GAG', 'TTT', 'GGT', 'CAT', 'ATC', 'AAG', 'CTT', 'ATG', 'AAT', 'CCT', 'CAA', 'CGT', 'AGT', 'ACA', 'GTT', 'TGG', 'TAT']
 mut_codon_list_nnk = ['ATG', 'ATT', 'ACG', 'ACT', 'AAG', 'AAT', 'AGT', 'AGG', 'GGT', 'GGG', 'GAT', 'GAG', 'GCT', 'GCG', 'GTT', 'GTG', 'CGG', 'CGT', 'CAT', 'CAG', 'CCG', 'CCT', 'CTG', 'CTT', 'TTG', 'TTT', 'TCT', 'TCG', 'TAT', 'TGT', 'TGG']
-row_nnk = [10, 11, 12, 13, 43, 44, 63]
 
 
 def find_input_files(inputdir):
@@ -114,13 +113,13 @@ def read_csv_pandas(path_to_tsv):
     return pd.read_table(path_to_tsv, header=0)
 
 
-def make_HDF5(input_file, reference_sequence, frameshift_position, frameshift_offset, wt_ref_position, wt_codon, wt_count):
+def make_HDF5(input_file, reference_sequence, frameshift_position, frameshift_offset, nnk_positions, wt_ref_position, wt_codon, wt_count):
     data_frame = read_csv_pandas(input_file)
     print(data_frame)
     for AA in data_frame.columns[1:65]:
         for row in data_frame.index:
 
-            if row in row_nnk:
+            if row in nnk_positions:
                 if AA not in mut_codon_list_nnk and data_frame.loc[row, AA] < wt_count:
                     data_frame.loc[row, AA] = 0
             elif AA not in mut_codon_list and data_frame.loc[row, AA] < wt_count:
