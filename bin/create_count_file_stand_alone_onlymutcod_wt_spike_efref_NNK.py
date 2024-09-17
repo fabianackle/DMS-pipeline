@@ -102,7 +102,7 @@ def write_HGVS5_format_position(start_shift, reference_position, reference_codon
 
 
 def translate(codon):
-    return CODON_TABLE[codon]
+    return CODON_TABLE[str(codon).upper()]
 
 
 def threeletter_AA(one_letter_AA):
