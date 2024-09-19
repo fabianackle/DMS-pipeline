@@ -43,46 +43,45 @@ process RemoveAdapter {
 
 process Align {
     cpus 8
-    memory '2 GB'
-    time '30m'
-    conda "bioconda::bwa-mem2=2.2.1"
+    memory '4 GB'
+    time '1h'
+    conda "bioconda::bwa=0.7.18 bioconda::samtools=1.2"
     tag "BWA on $sample_id"
 
     input:
     tuple path(wt_sequence), val(sample_id), path(trimmed_sequence_1), path(trimmed_sequence_2)
 
     output:
-    tuple val(sample_id), path("${sample_id}_adaptor_removed_trimmed.raw.sam")
+    tuple val(sample_id), path("${sample_id}_aligned.raw.bam")
 
     script:
     """
-    bwa-mem2 index $wt_sequence
+    bwa index $wt_sequence
 
-    bwa-mem2 mem -t $task.cpus \
+    bwa mem -t $task.cpus \
         $wt_sequence \
         $trimmed_sequence_1 $trimmed_sequence_2 \
-        > ${sample_id}_adaptor_removed_trimmed.raw.sam
+        | samtools view -S -b - > ${sample_id}_aligned.raw.bam
     """
 }
 
 process Sort {
-    cpus 4
-    memory '4 GB'
-    time '30m'
-    conda "bioconda::samtools=1.20"
-    tag "Samtools on $sample_id"
+    cpus 8
+    memory '8 GB'
+    time '60m'
+    conda "bioconda::sambamba=1.01"
+    tag "Sambamba on $sample_id"
 
     input:
-    tuple val(sample_id), path(aligned_sam)
+    tuple val(sample_id), path(aligned_bam)
 
     output:
-    path("${sample_id}_adaptor_removed_trimmed.raw.bam")
+    path("${sample_id}_sorted.raw.bam")
 
     script:
     """
-    samtools sort -@ $task.cpus \
-        $aligned_sam \
-        -o ${sample_id}_adaptor_removed_trimmed.raw.bam
+    cp ${aligned_bam} ${sample_id}_sorted.raw.bam
+    sambamba sort -t $task.cpus ${sample_id}_sorted.raw.bam
     """
 }
 
@@ -182,12 +181,12 @@ workflow {
         .set { wt_sequence_ch }
     trimmed_ch = RemoveAdapter(read_pairs_ch)
     align_input_ch = wt_sequence_ch.combine(trimmed_ch)
-    //aligned_ch = Align(align_input_ch)
-    //sorted_ch = Sort(aligned_ch)
-    sorted_ch = AlignSort(align_input_ch)
+    aligned_ch = Align(align_input_ch)
+    sorted_ch = Sort(aligned_ch)
+    //sorted_ch = AlignSort(align_input_ch)
     //subsample_ch = Subsample(sorted_ch)
     //dms_abc_input_ch = wt_sequence_ch.combine(subsample_ch)
-    dms_abc_input_ch = wt_sequence_ch.combine(sorted_ch)
+    //dms_abc_input_ch = wt_sequence_ch.combine(sorted_ch)
     //dms_abc_input_ch.view()
-    Analysis_DMS(dms_abc_input_ch)
+    //Analysis_DMS(dms_abc_input_ch)
 }
