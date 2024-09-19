@@ -45,7 +45,7 @@ process Align {
     cpus 8
     memory '4 GB'
     time '1h'
-    conda "bioconda::bwa=0.7.18 bioconda::samtools=1.2"
+    conda "bioconda::bwa=0.7.18 bioconda::samtools=1.20"
     tag "BWA on $sample_id"
 
     input:
@@ -69,7 +69,7 @@ process Sort {
     cpus 8
     memory '8 GB'
     time '60m'
-    conda "bioconda::sambamba=1.01"
+    conda "bioconda::sambamba=1.0.1"
     tag "Sambamba on $sample_id"
 
     input:
