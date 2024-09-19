@@ -20,7 +20,7 @@ process RemoveAdapter {
     errorStrategy 'ignore'
     cpus 8
     memory '1 GB'
-    time '15m'
+    time '10m'
     conda "bioconda::cutadapt=4.8"
     tag "Cutadapt on $sample_id"
 
@@ -43,8 +43,8 @@ process RemoveAdapter {
 
 process Align {
     cpus 8
-    memory '4 GB'
-    time '1h'
+    memory '2 GB'
+    time '20m'
     conda "bioconda::bwa=0.7.18 bioconda::samtools=1.20"
     tag "BWA on $sample_id"
 
@@ -67,8 +67,8 @@ process Align {
 
 process Sort {
     cpus 8
-    memory '8 GB'
-    time '60m'
+    memory '3 GB'
+    time '10m'
     conda "bioconda::sambamba=1.0.1"
     tag "Sambamba on $sample_id"
 
