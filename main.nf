@@ -80,8 +80,7 @@ process Sort {
 
     script:
     """
-    cp ${aligned_bam} ${sample_id}_sorted.raw.bam
-    sambamba sort -t $task.cpus ${sample_id}_sorted.raw.bam
+    sambamba sort -t $task.cpus -o ${sample_id}_sorted.raw.bam ${aligned_bam}
     """
 }
 
