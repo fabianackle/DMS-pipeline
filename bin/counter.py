@@ -1,7 +1,7 @@
 """
 @author: gmeier
 """
-
+import pandas as pd
 import pysam
 import numpy as np
 import matplotlib.pyplot as plt
@@ -74,6 +74,7 @@ AA_CODES = {
 
 
 def pileup_counter(bam_file, starts, quality_filter, reference_name, reference_seq):
+    reads_dict = {}
 
     pileup_dict = copy.copy(COUNT_TABLE)
     for read1, read2 in mate_generator.read_pair_generator(bam_file, reference_name, start=starts, end=starts + 1):
@@ -130,6 +131,7 @@ def pileup_counter(bam_file, starts, quality_filter, reference_name, reference_s
                             continue
                         else:
                             pileup_dict['reads_with_additional_mutation_1'] = pileup_dict['reads_with_additional_mutation_1'] + 1
+                            reads_dict[(read1.query_name)] = ("reads_with_additional_mutation_1", read1.query_sequence[:], read2.query_sequence[:])
                             break_check = False
                             break
 
@@ -139,12 +141,14 @@ def pileup_counter(bam_file, starts, quality_filter, reference_name, reference_s
                             continue
                         else:
                             pileup_dict['reads_with_additional_mutation_2'] = pileup_dict['reads_with_additional_mutation_2'] + 1
+                            reads_dict[(read1.query_name)] = ("reads_with_additional_mutation_2", read1.query_sequence[:], read2.query_sequence[:])
                             break_check = False
                             break
 
                     elif r1_base != wt_base and r2_base != wt_base:  # read1 is not wt and read 2 is not wt
                         if any(x >= 30 for x in [q_r1_base, q_r2_base]):
                             pileup_dict['reads_with_additional_mutation_3'] = pileup_dict['reads_with_additional_mutation_3'] + 1
+                            reads_dict[(read1.query_name)] = ("reads_with_additional_mutation_3_rev", read1.query_sequence[:], read2.query_sequence[:])
                             break_check = False
 
                             break
@@ -176,6 +180,7 @@ def pileup_counter(bam_file, starts, quality_filter, reference_name, reference_s
                                 continue
                             else:
                                 pileup_dict['reads_with_additional_mutation_1_rev'] = pileup_dict['reads_with_additional_mutation_1_rev'] + 1
+                                reads_dict[(read1.query_name)] = ("reads_with_additional_mutation_1_rev", read1.query_sequence[:], read2.query_sequence[:])
                                 break_check = False
                                 break
 
@@ -185,12 +190,14 @@ def pileup_counter(bam_file, starts, quality_filter, reference_name, reference_s
                                 continue
                             else:
                                 pileup_dict['reads_with_additional_mutation_2_rev'] = pileup_dict['reads_with_additional_mutation_2_rev'] + 1
+                                reads_dict[(read1.query_name)] = ("reads_with_additional_mutation_2_rev", read1.query_sequence[:], read2.query_sequence[:])
                                 break_check = False
                                 break
 
                         elif r1_base != wt_base and r2_base != wt_base:  # read1 is not wt and read 2 is not wt
                             if any(x >= 30 for x in [q_r1_base, q_r2_base]):
                                 pileup_dict['reads_with_additional_mutation_3_rev'] = pileup_dict['reads_with_additional_mutation_3_rev'] + 1
+                                reads_dict[(read1.query_name)] = ("reads_with_additional_mutation_3_rev", read1.query_sequence[:], read2.query_sequence[:])
                                 break_check = False
                                 break
 
@@ -205,6 +212,11 @@ def pileup_counter(bam_file, starts, quality_filter, reference_name, reference_s
 
             elif triplett1 != triplett2:
                 pileup_dict['Triplett_not_identical_in_mates'] = pileup_dict['Triplett_not_identical_in_mates'] + 1
+
+    df_clusters = pd.DataFrame.from_dict(reads_dict, orient='index', columns=['reason', 'seq1', 'seq2'])
+    df_clusters.reset_index(inplace=True)
+    df_clusters.rename(columns={'index': 'read_ids'}, inplace=True)
+    df_clusters.to_csv('reads.csv', index=False)
 
     return pileup_dict
 
