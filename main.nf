@@ -1,8 +1,8 @@
 #!/usr/bin/env nextflow
 
 /* Define parameters */
-params.reads = "$projectDir/data/*_R{1,2}*.fastq.gz"
-params.wt_sequence = "$projectDir/data/EfrEF_opt_wt_sequence.fa"
+params.reads = "$projectDir/data/*_R{1,2}_001.fastq.gz"
+params.wt_sequence = "$projectDir/data/LmrCD_WT.fa"
 params.outdir = "$projectDir/results"
 
 /* Print pipeline info */
@@ -161,14 +161,14 @@ process Analysis_DMS {
     run_dms_abc.py \
         --bam "${bam}" \
         --reference "${wt_sequence}" \
-        --positions 72 84 207 216 360 372 381 384 396 405 519 528 540 552 672 684 696 705 717 729 741 750 762 825 828 837 840 849 858 861 870 879 882 891 1026 1119 1245 1419 1488 1506 1581 1879 1891 2050 2059 2203 2218 2224 2227 2239 2248 2362 2371 2383 2395 2515 2527 2539 2545 2548 2560 2572 2584 2593 2605 2671 2680 2683 2692 2701 2704 2713 2722 2725 2734 2863 2953 3079 3253 3322 3340 3415 \
-        --nnk_positions 10 11 12 13 43 44 63 \
-        --wt_ref_position 2545 \
-        --wt_codon TTG \
+        --positions 66 78 216 225 369 381 390 393 405 414 528 537 549 561 681 693 705 714 726 738 750 759 771 846 849 858 861 870 879 882 891 900 903 912 1038 1131 1257 1431 1500 1518 1593 1863 1875 2217 2226 2259 2352 2370 2385 2391 2394 2406 2415 2529 2538 2550 2562 2580 2682 2694 2706 2715 2727 2739 2751 2760 2772 2853 2862 2865 2874 2883 2886 2895 2904 2907 2916 3042 3132 3258 3432 3501 3519 3594 \
+        --nnk_positions 55 59 70 78 \
+        --wt_ref_position 2259 \
+        --wt_codon TCA \
         --wt_count 10000 \
         --readingframes \
-        --frameshift_position 1728 \
-        --frameshift_offset 52 \
+        --frameshift_position 1740 \
+        --frameshift_offset 3
     """
 }
 
