@@ -37,6 +37,7 @@ process RemoveAdapter {
         -A AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT \
         -o ${sample_id}_R1_adapter_removed.fastq.gz \
         -p ${sample_id}_R2_adapter_removed.fastq.gz \
+        --minimum-length 50 \
         ${reads[0]} ${reads[1]}
     """
 }
@@ -80,7 +81,8 @@ process Sort {
 
     script:
     """
-    sambamba sort -t $task.cpus -o ${sample_id}_sorted.raw.bam ${aligned_bam}
+    cp ${aligned_bam} ${sample_id}_sorted.raw.bam
+    sambamba sort -t $task.cpus ${sample_id}_sorted.raw.bam
     """
 }
 
@@ -88,7 +90,7 @@ process AlignSort {
     cpus 8
     memory '8 GB'
     time '1h'
-    conda "bioconda::bwa-mem2=2.2.1 bioconda::samtools=1.20"
+    conda "bioconda::bwa=0.7.18 bioconda::samtools=1.20"
     tag "BWA and samtools on $sample_id"
 
     input:
@@ -99,9 +101,9 @@ process AlignSort {
 
     script:
     """
-    bwa-mem2 index $wt_sequence
+    bwa index $wt_sequence
 
-    bwa-mem2 mem -t $task.cpus \
+    bwa mem -t $task.cpus \
         $wt_sequence \
         $trimmed_sequence_1 $trimmed_sequence_2 \
         | samtools sort -@ $task.cpus \
