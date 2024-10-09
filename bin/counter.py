@@ -146,7 +146,7 @@ def pileup_counter(bam_file, starts, quality_filter, reference_name, reference_s
                             break
 
                     elif r1_base != wt_base and r2_base != wt_base:  # read1 is not wt and read 2 is not wt
-                        if any(x >= 30 for x in [q_r1_base, q_r2_base]):
+                        if any(x < 30 for x in [q_r1_base, q_r2_base]):
                             pileup_dict['reads_with_additional_mutation_3'] = pileup_dict['reads_with_additional_mutation_3'] + 1
                             reads_dict[(read1.query_name)] = ("reads_with_additional_mutation_3_rev", read1.query_sequence[:], read2.query_sequence[:])
                             break_check = False
@@ -195,7 +195,7 @@ def pileup_counter(bam_file, starts, quality_filter, reference_name, reference_s
                                 break
 
                         elif r1_base != wt_base and r2_base != wt_base:  # read1 is not wt and read 2 is not wt
-                            if any(x >= 30 for x in [q_r1_base, q_r2_base]):
+                            if any(x < 30 for x in [q_r1_base, q_r2_base]):
                                 pileup_dict['reads_with_additional_mutation_3_rev'] = pileup_dict['reads_with_additional_mutation_3_rev'] + 1
                                 reads_dict[(read1.query_name)] = ("reads_with_additional_mutation_3_rev", read1.query_sequence[:], read2.query_sequence[:])
                                 break_check = False
