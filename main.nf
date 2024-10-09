@@ -182,12 +182,11 @@ workflow {
         .set { wt_sequence_ch }
     trimmed_ch = RemoveAdapter(read_pairs_ch)
     align_input_ch = wt_sequence_ch.combine(trimmed_ch)
-    aligned_ch = Align(align_input_ch)
-    sorted_ch = Sort(aligned_ch)
-    //sorted_ch = AlignSort(align_input_ch)
-    //subsample_ch = Subsample(sorted_ch)
-    //dms_abc_input_ch = wt_sequence_ch.combine(subsample_ch)
-    //dms_abc_input_ch = wt_sequence_ch.combine(sorted_ch)
+    //aligned_ch = Align(align_input_ch)
+    //sorted_ch = Sort(aligned_ch)
+    sorted_ch = AlignSort(align_input_ch)
+    subsample_ch = Subsample(sorted_ch)
+    dms_abc_input_ch = wt_sequence_ch.combine(subsample_ch)
     //dms_abc_input_ch.view()
-    //Analysis_DMS(dms_abc_input_ch)
+    Analysis_DMS(dms_abc_input_ch)
 }
