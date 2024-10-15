@@ -89,7 +89,7 @@ process Sort {
 process AlignSort {
     cpus 8
     memory '8 GB'
-    time '1h'
+    time '20m'
     conda "bioconda::bwa=0.7.18 bioconda::samtools=1.20"
     tag "BWA and samtools on $sample_id"
 
@@ -113,6 +113,8 @@ process AlignSort {
 
 process Subsample {
     cpus 8
+    memory '1 GB'
+    time '5 min'
     conda "bioconda::samtools=1.20"
     tag "Samtools view on $big_bam"
 
@@ -142,7 +144,7 @@ process Subsample {
 process Analysis_DMS {
     cpus 1
     memory '1 GB'
-    time '1h'
+    time '2h'
     conda "DMS_ABC.yml"
     tag "DMS_ABC on $bam"
 
