@@ -25,6 +25,11 @@ process RemoveAdapter {
         --minimum-length 50 \
         ${reads[0]} ${reads[1]}
     """
+
+    stub:
+    """
+    touch ${sample_id}_R1_adapter_removed.fastq.gz ${sample_id}_R2_adapter_removed.fastq.gz
+    """
 }
 
 process Align {
@@ -49,6 +54,11 @@ process Align {
         $trimmed_sequence_1 $trimmed_sequence_2 \
         | samtools view -S -b - > ${sample_id}_aligned.raw.bam
     """
+
+    stub:
+    """
+    touch ${sample_id}_aligned.raw.bam
+    """
 }
 
 process Sort {
@@ -69,6 +79,10 @@ process Sort {
     cp ${aligned_bam} ${sample_id}_sorted.raw.bam
     sambamba sort -t $task.cpus ${sample_id}_sorted.raw.bam
     """
+    stub:
+    """
+    touch ${sample_id}_sorted.raw.bam
+    """
 }
 
 process AlignSort {
@@ -79,7 +93,7 @@ process AlignSort {
     tag "BWA and samtools on $sample_id"
 
     input:
-    tuple path(wt_sequence), val(sample_id), path(trimmed_sequence_1), path(trimmed_sequence_2)
+    tuple val(sample_id), path(trimmed_sequence_1), path(trimmed_sequence_2), path(wt_sequence)
 
     output:
     path("${sample_id}_adaptor_removed_trimmed.raw.bam")
@@ -93,7 +107,12 @@ process AlignSort {
         $trimmed_sequence_1 $trimmed_sequence_2 \
         | samtools sort -@ $task.cpus \
         -o ${sample_id}_adaptor_removed_trimmed.raw.bam
-    """    
+    """
+
+    stub:
+    """
+    touch ${sample_id}_adaptor_removed_trimmed.raw.bam
+    """   
 }
 
 process Subsample {
@@ -124,6 +143,11 @@ process Subsample {
 
     rm "${big_bam.baseName}_temp.bam"
     """
+
+    stub:
+    """
+    touch ${big_bam.baseName}_subsampled.bam
+    """
 }
 
 process Analysis_DMS {
@@ -136,7 +160,7 @@ process Analysis_DMS {
     publishDir params.outdir, mode: 'copy'
 
     input:
-    tuple path(wt_sequence), path(bam)
+    tuple path(bam), path(wt_sequence)
 
     output:
     path "${bam.baseName}_triplet_count.txt_readingframe_{1,2}_HDF5.csv"
@@ -157,6 +181,11 @@ process Analysis_DMS {
         --frameshift_position ${params.frameshift_position} \
         --frameshift_offset ${params.frameshift_offset}
     """
+
+    stub:
+    """
+    touch ${bam.baseName}_triplet_count.txt_readingframe_{1,2}_HDF5.csv ${bam.baseName}_triplet_count.txt
+    """
 }
 
 /* Workflow */
@@ -172,16 +201,23 @@ workflow {
     """
     .stripIndent()
 
-    Channel
-        .fromFilePairs(params.reads, checkIfExists: true)
-        .set { read_pairs_ch }
-    Channel
-        .fromPath(params.wt_sequence, checkIfExists: true)
-        .set { wt_sequence_ch }
+    if (workflow.stubRun) {
+        // Stub channels
+        read_pairs_ch = Channel.fromList([
+            ['sample1', [file('dummy_R1.fastq.gz'), file('dummy_R2.fastq.gz')]],
+            ['sample2', [file('dummy_R1.fastq.gz'), file('dummy_R2.fastq.gz')]]
+        ])
+        wt_sequence_ch = Channel.fromList([file('dummy_wt_sequence.fasta')])
+    } else {
+        // Real channels
+        read_pairs_ch = Channel.fromFilePairs(params.reads, checkIfExists: true)
+        wt_sequence_ch = Channel.fromPath(params.wt_sequence, checkIfExists: true)
+    }
 
-    trimmed_ch = RemoveAdapter(read_pairs_ch)
-    align_input_ch = wt_sequence_ch.combine(trimmed_ch)
-    sorted_ch = AlignSort(align_input_ch)
-    dms_abc_input_ch = wt_sequence_ch.combine(sorted_ch)
-    Analysis_DMS(dms_abc_input_ch)
+    read_pairs_ch
+    | RemoveAdapter
+    | combine(wt_sequence_ch)
+    | AlignSort
+    | combine(wt_sequence_ch)
+    | Analysis_DMS
 }
