@@ -5,16 +5,6 @@ params.reads = "$projectDir/data/*_R{1,2}*.fastq.gz"
 params.wt_sequence = "$projectDir/data/EfrEF_opt_wt_sequence.fa"
 params.outdir = "$projectDir/results"
 
-/* Print pipeline info */
-log.info """
-    ===============================
-    D M S - A B C   P I P E L I N E
-    ===============================
-    Reads : ${params.reads}
-    Output dir: ${params.outdir}
-    """
-    .stripIndent()
-
 /* Processes */
 process RemoveAdapter {
     errorStrategy 'ignore'
@@ -174,12 +164,24 @@ process Analysis_DMS {
 
 /* Workflow */
 workflow {
+    /* Print pipeline info */
+    log.info """
+    ===============================
+    D M S - A B C   P I P E L I N E
+    ===============================
+    Reads : ${params.reads}
+    Reference: ${params.wt_sequence}
+    Output dir: ${params.outdir}
+    """
+    .stripIndent()
+
     Channel
         .fromFilePairs(params.reads, checkIfExists: true)
         .set { read_pairs_ch }
     Channel
         .fromPath(params.wt_sequence, checkIfExists: true)
         .set { wt_sequence_ch }
+
     trimmed_ch = RemoveAdapter(read_pairs_ch)
     align_input_ch = wt_sequence_ch.combine(trimmed_ch)
     //aligned_ch = Align(align_input_ch)
