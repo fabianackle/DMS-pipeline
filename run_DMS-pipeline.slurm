@@ -10,4 +10,4 @@ module load mamba
 eval "$(conda shell.bash hook)"
 conda activate nextflow
 
-nextflow run main.nf -resume -with-report -with-timeline -ansi-log false
+nextflow run main.nf -params-file LmrCD.json -resume -with-report -with-timeline -ansi-log false

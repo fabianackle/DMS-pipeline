@@ -23,8 +23,8 @@ process RemoveAdapter {
     script:
     """
     cutadapt -j $task.cpus \
-        -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA \
-        -A AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT \
+        -a ${params.adapter_R1} \
+        -A ${params.adapter_R2} \
         -o ${sample_id}_R1_adapter_removed.fastq.gz \
         -p ${sample_id}_R2_adapter_removed.fastq.gz \
         --minimum-length 50 \
@@ -151,14 +151,14 @@ process Analysis_DMS {
     run_dms_abc.py \
         --bam "${bam}" \
         --reference "${wt_sequence}" \
-        --positions 72 84 207 216 360 372 381 384 396 405 519 528 540 552 672 684 696 705 717 729 741 750 762 825 828 837 840 849 858 861 870 879 882 891 1026 1119 1245 1419 1488 1506 1581 1879 1891 2050 2059 2203 2218 2224 2227 2239 2248 2362 2371 2383 2395 2515 2527 2539 2545 2548 2560 2572 2584 2593 2605 2671 2680 2683 2692 2701 2704 2713 2722 2725 2734 2863 2953 3079 3253 3322 3340 3415 \
-        --nnk_positions 10 11 12 13 43 44 63 \
-        --wt_ref_position 2545 \
-        --wt_codon TTG \
-        --wt_count 10000 \
+        --positions ${params.positions} \
+        --nnk_positions ${params.nnk_positions} \
+        --wt_ref_position ${params.wt_ref_position} \
+        --wt_codon ${params.wt_codon} \
+        --wt_count ${params.wt_count} \
         --readingframes \
-        --frameshift_position 1728 \
-        --frameshift_offset 52 \
+        --frameshift_position ${params.frameshift_position} \
+        --frameshift_offset ${params.frameshift_offset}
     """
 }
 
