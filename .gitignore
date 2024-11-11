@@ -1,6 +1,7 @@
 .nextflow
 __pycache__
 data
+dev
 results
 work
 .DS_Store
