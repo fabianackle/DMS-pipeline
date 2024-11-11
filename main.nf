@@ -98,6 +98,8 @@ process AlignSort {
 
 process Subsample {
     cpus 8
+    memory '1 GB'
+    time '10m'
     conda "bioconda::samtools=1.20"
     tag "Samtools view on $big_bam"
 
@@ -127,7 +129,7 @@ process Subsample {
 process Analysis_DMS {
     cpus 1
     memory '1 GB'
-    time '1h'
+    time '2h'
     conda "DMS_ABC.yml"
     tag "DMS_ABC on $bam"
 
