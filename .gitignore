@@ -6,5 +6,6 @@ results
 work
 .DS_Store
 .nextflow.log*
+dag*.html
 report*.html
 timeline*.html

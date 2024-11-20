@@ -1,0 +1,25 @@
+module_order:
+  - fastqc
+  - cutadapt
+  - samtools:
+      name: "Samtools (initial)"
+      anchor: "samtools_initial"
+      info: "This section of the report shows Samtools results after adapter trimming."
+      path_filters:
+        - "*_samtools_coverage.txt"
+        - "*_samtools_stats.txt"
+  - samtools:
+      name: "Samtools (DMS)"
+      anchor: "samtools_dms"
+      info: "This section of the report shows Samtools results after DMS analysis (codon truncated)."
+      path_filters:
+        - "*_samtools_coverage_dms.txt"
+        - "*_samtools_stats_dms.txt"
+
+extra_fn_clean_exts:
+  - "_cutadapt"
+  - "_samtools"
+
+table_sample_merge:
+  "R1": "_R1_001"
+  "R2": "_R2_001"

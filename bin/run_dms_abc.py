@@ -15,6 +15,7 @@ import create_count_file_stand_alone_onlymutcod_wt_spike_efref_NNK
 def parse_arguments():
     """Parse the command line arguments"""
     parser = argparse.ArgumentParser(description="Settings for DMS_ABC script.")
+    parser.add_argument("--sample_id")
     parser.add_argument("--bam")
     parser.add_argument("--reference")  # reference fasta file
     parser.add_argument("--positions", nargs='+', type=int)  # list codons to be analyzed
@@ -48,8 +49,8 @@ def read_refrence(fasta_file):
 def DMS_processing(parameters):
     """Running the DMS_ABC scripts"""
     input_file = parameters["bam"]
-    codontruncated_file = input_file[:-4] + "_codontruncated.bam"
-    triplet_count_file = input_file[:-4] + "_triplet_count.txt"
+    codontruncated_file = parameters["sample_id"] + "_codontruncated.bam"
+    triplet_count_file = parameters["sample_id"] + "_triplet_count.txt"
 
     frameshift_position = parameters["frameshift_position"]
     frameshift_offset = parameters["frameshift_offset"]
@@ -76,6 +77,7 @@ def main():
     reference_name, reference_sequence = read_refrence(args.reference)
 
     parameters = {
+        'sample_id': args.sample_id,
         'bam': args.bam,
         'reference_name': reference_name,
         'reference_sequence': reference_sequence,

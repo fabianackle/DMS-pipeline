@@ -13,7 +13,8 @@ process RemoveAdapter {
     tuple val(sample_id), path(reads)
 
     output:
-    tuple val(sample_id), path("${sample_id}_R1_adapter_removed.fastq.gz"), path("${sample_id}_R2_adapter_removed.fastq.gz")
+    tuple val(sample_id), path("${sample_id}_R1_adapter_removed.fastq.gz"), path("${sample_id}_R2_adapter_removed.fastq.gz"), emit: cut
+    path("${sample_id}_cutadapt.log"), emit: log
 
     script:
     """
@@ -23,12 +24,39 @@ process RemoveAdapter {
         -o ${sample_id}_R1_adapter_removed.fastq.gz \
         -p ${sample_id}_R2_adapter_removed.fastq.gz \
         --minimum-length 50 \
-        ${reads[0]} ${reads[1]}
+        ${reads[0]} ${reads[1]} \
+        > ${sample_id}_cutadapt.log
     """
 
     stub:
     """
     touch ${sample_id}_R1_adapter_removed.fastq.gz ${sample_id}_R2_adapter_removed.fastq.gz
+    touch ${sample_id}_cutadapt.log
+    """
+}
+
+process FastQC {
+    cpus 8
+    memory '4 GB'
+    time '10m'
+    conda "bioconda::fastqc=0.12.1"
+    tag "FastQC on $sample_id"
+
+    input:
+    tuple val(sample_id), path(reads)
+
+    output:
+    path("*.{html,zip}"), emit: stats
+
+    script:
+    """
+    fastqc --threads $task.cpus \
+        ${reads[0]} ${reads[1]}
+    """
+
+    stub:
+    """
+    touch ${sample_id}.html ${sample_id}.zip
     """
 }
 
@@ -43,7 +71,7 @@ process Align {
     tuple path(wt_sequence), val(sample_id), path(trimmed_sequence_1), path(trimmed_sequence_2)
 
     output:
-    tuple val(sample_id), path("${sample_id}_aligned.raw.bam")
+    tuple val(sample_id), path("${sample_id}_aligned.raw.bam"), emit: aligned
 
     script:
     """
@@ -72,7 +100,7 @@ process Sort {
     tuple val(sample_id), path(aligned_bam)
 
     output:
-    path("${sample_id}_sorted.raw.bam")
+    path("${sample_id}_sorted.raw.bam"), emit: sorted
 
     script:
     """
@@ -88,7 +116,7 @@ process Sort {
 process AlignSort {
     cpus 8
     memory '8 GB'
-    time '1h'
+    time '45m'
     conda "bioconda::bwa=0.7.18 bioconda::samtools=1.20"
     tag "BWA and samtools on $sample_id"
 
@@ -96,7 +124,7 @@ process AlignSort {
     tuple val(sample_id), path(trimmed_sequence_1), path(trimmed_sequence_2), path(wt_sequence)
 
     output:
-    path("${sample_id}_adaptor_removed_trimmed.raw.bam")
+    tuple val(sample_id), path("${sample_id}_adaptor_removed_trimmed.raw.bam"), emit: bam
 
     script:
     """
@@ -120,33 +148,87 @@ process Subsample {
     memory '1 GB'
     time '10m'
     conda "bioconda::samtools=1.20"
-    tag "Samtools view on $big_bam"
-
-    publishDir params.outdir, mode: 'copy'
+    tag "Samtools view on $sample_id"
 
     input:
-    path big_bam
+    tuple val(sample_id), path(big_bam)
 
     output:
-    path "${big_bam.baseName}_subsampled.bam"
+    tuple val(sample_id), path("${sample_id}_subsampled.bam"), emit: bam
 
     script:
     """
     samtools view -@ $task.cpus \
         --subsample 0.01 --subsample-seed 123 \
-        -b -o "${big_bam.baseName}_temp.bam" \
+        -b -o "${sample_id}_temp.bam" \
         $big_bam
 
     samtools sort -@ $task.cpus \
-        "${big_bam.baseName}_temp.bam" \
-        -o "${big_bam.baseName}_subsampled.bam"
+        "${sample_id}_temp.bam" \
+        -o "${sample_id}_subsampled.bam"
 
-    rm "${big_bam.baseName}_temp.bam"
+    rm "${sample_id}_temp.bam"
     """
 
     stub:
     """
-    touch ${big_bam.baseName}_subsampled.bam
+    touch ${sample_id}_subsampled.bam
+    """
+}
+
+process SamtoolsStats {
+    cpus 8
+    memory '1 GB'
+    time '45m'
+    conda "bioconda::samtools=1.20"
+    tag "Samtools on $sample_id"
+
+    input:
+    tuple val(sample_id), path(bam)
+
+    output:
+    path("*.txt"), emit: stats
+
+    script:
+    """
+    samtools stats -@ $task.cpus \
+        ${bam} > ${sample_id}_samtools_stats.txt
+    samtools coverage \
+        ${bam} > ${sample_id}_samtools_coverage.txt
+    """
+
+    stub:
+    """
+    touch ${sample_id}_samtools_stats.txt
+    touch ${sample_id}_samtools_coverage.txt
+    """
+}
+
+process SamtoolsStats2 {
+    cpus 8
+    memory '1 GB'
+    time '45m'
+    conda "bioconda::samtools=1.20"
+    tag "Samtools on $sample_id"
+
+    input:
+    tuple val(sample_id), path(bam)
+
+    output:
+    path("*.txt"), emit: stats
+
+    script:
+    """
+    samtools stats -@ $task.cpus \
+        ${bam} > ${sample_id}_samtools_stats_dms.txt
+    samtools coverage \
+        ${bam} > ${sample_id}_samtools_coverage_dms.txt
+    """
+
+    stub:
+    """
+    touch ${sample_id}_samtools_stats_dms.txt
+    touch ${sample_id}_samtools_coverage_dms.txt
     """
 }
 
@@ -155,21 +237,22 @@ process Analysis_DMS {
     memory '1 GB'
     time '2h'
     conda "DMS_ABC.yml"
-    tag "DMS_ABC on $bam"
+    tag "DMS_ABC on $sample_id"
 
-    publishDir params.outdir, mode: 'copy'
+    publishDir params.outdir, mode: 'copy', pattern: "*.{csv,txt}"
 
     input:
-    tuple path(bam), path(wt_sequence)
+    tuple val(sample_id), path(bam), path(wt_sequence)
 
     output:
-    path "${bam.baseName}_triplet_count.txt_readingframe_{1,2}_HDF5.csv"
-    path "${bam.baseName}_triplet_count.txt"
+    path("${sample_id}_triplet_count.txt_readingframe_{1,2}_HDF5.csv"), emit: counts_readingframe
+    path("${sample_id}_triplet_count.txt"), emit: counts
+    tuple val(sample_id), path("${sample_id}_codontruncated.bam"), emit: bam
     
-
     script:
     """
     run_dms_abc.py \
+        --sample_id ${sample_id} \
         --bam "${bam}" \
         --reference "${wt_sequence}" \
         --positions ${params.positions} \
@@ -184,7 +267,38 @@ process Analysis_DMS {
 
     stub:
     """
-    touch ${bam.baseName}_triplet_count.txt_readingframe_{1,2}_HDF5.csv ${bam.baseName}_triplet_count.txt
+    touch ${sample_id}_triplet_count.txt_readingframe_1_HDF5.csv ${sample_id}_triplet_count.txt_readingframe_2_HDF5.csv
+    touch ${sample_id}_triplet_count.txt
+    touch ${sample_id}_codontruncated.bam
+    """
+}
+
+process MultiQC {
+    cpus 1
+    time '2m'
+    memory '256 MB'
+    conda "bioconda::multiqc=1.25.1"
+    tag "MultiQC"
+
+    publishDir params.outdir, mode: 'copy'
+
+    input:
+    path("*")
+    path(multiqc_config)
+
+    output:
+    path("multiqc_report.html"), emit: report
+    path("multiqc_data"), emit: data
+
+    script:
+    """
+    multiqc --config ${multiqc_config} .
+    """
+
+    stub:
+    """
+    mkdir multiqc_data
+    touch multiqc_report.html
     """
 }
 
@@ -214,10 +328,19 @@ workflow {
         wt_sequence_ch = Channel.fromPath(params.wt_sequence, checkIfExists: true)
     }
 
-    read_pairs_ch
-    | RemoveAdapter
-    | combine(wt_sequence_ch)
-    | AlignSort
-    | combine(wt_sequence_ch)
-    | Analysis_DMS
+    FastQC(read_pairs_ch)
+    RemoveAdapter(read_pairs_ch)
+    AlignSort(RemoveAdapter.out.cut.combine(wt_sequence_ch))
+    SamtoolsStats(AlignSort.out.bam)
+    Analysis_DMS(AlignSort.out.bam.combine(wt_sequence_ch))
+    SamtoolsStats2(Analysis_DMS.out.bam)
+
+    multiqc_config_ch = Channel.fromPath(params.multiqc_config)
+    multiqc_files_ch = Channel.empty()
+    multiqc_files_ch = multiqc_files_ch.mix(FastQC.out.stats)
+    multiqc_files_ch = multiqc_files_ch.mix(RemoveAdapter.out.log)
+    multiqc_files_ch = multiqc_files_ch.mix(SamtoolsStats.out.stats)
+    multiqc_files_ch = multiqc_files_ch.mix(SamtoolsStats2.out.stats)
+    multiqc_files_ch = multiqc_files_ch.collect()
+    MultiQC(multiqc_files_ch, multiqc_config_ch)
 }
