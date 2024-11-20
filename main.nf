@@ -60,59 +60,6 @@ process FastQC {
     """
 }
 
-process Align {
-    cpus 8
-    memory '2 GB'
-    time '20m'
-    conda "bioconda::bwa=0.7.18 bioconda::samtools=1.20"
-    tag "BWA on $sample_id"
-
-    input:
-    tuple path(wt_sequence), val(sample_id), path(trimmed_sequence_1), path(trimmed_sequence_2)
-
-    output:
-    tuple val(sample_id), path("${sample_id}_aligned.raw.bam"), emit: aligned
-
-    script:
-    """
-    bwa index $wt_sequence
-
-    bwa mem -t $task.cpus \
-        $wt_sequence \
-        $trimmed_sequence_1 $trimmed_sequence_2 \
-        | samtools view -S -b - > ${sample_id}_aligned.raw.bam
-    """
-
-    stub:
-    """
-    touch ${sample_id}_aligned.raw.bam
-    """
-}
-
-process Sort {
-    cpus 8
-    memory '3 GB'
-    time '10m'
-    conda "bioconda::sambamba=1.0.1"
-    tag "Sambamba on $sample_id"
-
-    input:
-    tuple val(sample_id), path(aligned_bam)
-
-    output:
-    path("${sample_id}_sorted.raw.bam"), emit: sorted
-
-    script:
-    """
-    cp ${aligned_bam} ${sample_id}_sorted.raw.bam
-    sambamba sort -t $task.cpus ${sample_id}_sorted.raw.bam
-    """
-    stub:
-    """
-    touch ${sample_id}_sorted.raw.bam
-    """
-}
-
 process AlignSort {
     cpus 8
     memory '8 GB'
