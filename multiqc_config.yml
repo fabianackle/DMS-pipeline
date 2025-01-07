@@ -6,8 +6,8 @@ module_order:
       anchor: "samtools_initial"
       info: "This section of the report shows Samtools results after adapter trimming."
       path_filters:
-        - "*_samtools_coverage.txt"
-        - "*_samtools_stats.txt"
+        - "*_samtools_coverage_aligned.txt"
+        - "*_samtools_stats_aligned.txt"
   - samtools:
       name: "Samtools (DMS)"
       anchor: "samtools_dms"
