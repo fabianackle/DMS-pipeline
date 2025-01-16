@@ -1,6 +1,6 @@
 process MULTIQC {
     cpus 1
-    time '2m'
+    time '10m'
     memory '256 MB'
     conda "bioconda::multiqc=1.25.1"
     tag "MultiQC"

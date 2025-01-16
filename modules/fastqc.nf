@@ -1,7 +1,7 @@
 process FASTQC {
     cpus 8
     memory '4 GB'
-    time '10m'
+    time '1h'
     conda "bioconda::fastqc=0.12.1"
     tag "$sample_id"
 

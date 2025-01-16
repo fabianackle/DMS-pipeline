@@ -1,13 +1,13 @@
 process SAMTOOLS_STATS {
     cpus 8
     memory '1 GB'
-    time '45m'
+    time '1h'
     conda "bioconda::samtools=1.20"
     tag "$sample_id"
 
     input:
     tuple val(sample_id), path(bam)
-    val(stage)
+    each stage
 
     output:
     path("*.txt"), emit: stats
@@ -22,7 +22,7 @@ process SAMTOOLS_STATS {
 
     stub:
     """
-    touch ${sample_id}_samtools_stat_${stage}s.txt
+    touch ${sample_id}_samtools_stat_${stage}.txt
     touch ${sample_id}_samtools_coverage_${stage}.txt
     """
 }
