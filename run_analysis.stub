@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+nextflow run analysis.nf \
+    -params-file LmrCD_analysis.json \
+    -stub-run \
+    -profile stub \
+    -with-report \
+    -with-dag

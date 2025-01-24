@@ -1,6 +1,4 @@
 module_order:
-  - fastqc
-  - cutadapt
   - samtools:
       name: "Samtools (initial)"
       anchor: "samtools_initial"
@@ -17,9 +15,4 @@ module_order:
         - "*_samtools_stats_dms.txt"
 
 extra_fn_clean_exts:
-  - "_cutadapt"
   - "_samtools"
-
-table_sample_merge:
-  "R1": "_R1_001"
-  "R2": "_R2_001"
