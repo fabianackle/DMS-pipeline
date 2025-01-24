@@ -36,21 +36,19 @@ workflow {
     ===============================
     D M S - A B C   P I P E L I N E
     ===============================
+    Bam files : ${params.bams}
+    Reference : ${params.wt_sequence}
     Output dir: ${params.outdir}
     """
     .stripIndent()
 
     if (workflow.stubRun) {
         // Stub channels
-        bams_ch = Channel.fromList([
-            file('file0.bam'),
-            file('file2.bam'),
-            file('file3.bam'),
-            ])
+        bams_ch = Channel.fromPath(params.bams, checkIfExists: true)
         wt_sequence_ch = Channel.fromList([file('dummy_wt_sequence.fasta')])
     } else {
         // Real channels
-        bams_ch = Channel.fromFilePairs(params.bams, checkIfExists: true)
+        bams_ch = Channel.fromPath(params.bams, checkIfExists: true)
         wt_sequence_ch = Channel.fromPath(params.wt_sequence, checkIfExists: true)
     }
 
