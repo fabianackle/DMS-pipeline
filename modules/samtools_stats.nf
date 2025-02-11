@@ -1,7 +1,5 @@
 process SAMTOOLS_STATS {
-    cpus 8
-    memory '1 GB'
-    time '1h'
+    label "SAMTOOLS_STATS"
     conda "bioconda::samtools=1.20"
     tag "$sample_id"
 

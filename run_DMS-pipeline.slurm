@@ -11,8 +11,10 @@ eval "$(conda shell.bash hook)"
 conda activate nextflow
 
 nextflow run main.nf \
-    -params-file LmrCD.json \
+    -profile cluster \
     -resume \
     -with-report \
     -with-timeline \
-    -ansi-log false
+    -ansi-log false \
+    -params-file LmrCD.json \
+    --subsample false

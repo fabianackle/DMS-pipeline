@@ -1,7 +1,4 @@
 process ANALYSIS_DMS {
-    cpus 1
-    memory '1 GB'
-    time '2h'
     conda "DMS_ABC.yml"
     tag "$sample_id"
 

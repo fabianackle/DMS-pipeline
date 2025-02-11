@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
 nextflow run main.nf \
-    -stub-run \
-    -profile stub \
+    -profile local \
     -with-report \
-    -with-dag \
+    -with-timeline \
     -params-file LmrCD.json \
-    --subsample true
+    --subsample True

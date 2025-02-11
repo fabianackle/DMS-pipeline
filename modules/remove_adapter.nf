@@ -1,8 +1,5 @@
 process REMOVE_ADAPTER {
     errorStrategy 'ignore'
-    cpus 8
-    memory '1 GB'
-    time '10m'
     conda "bioconda::cutadapt=4.8"
     tag "$sample_id"
 
