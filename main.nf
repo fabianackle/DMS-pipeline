@@ -4,6 +4,7 @@
 include { REMOVE_ADAPTER                     } from './modules/remove_adapter.nf'
 include { FASTQC                             } from './modules/fastqc.nf'
 include { ALIGN_SORT                         } from './modules/align_sort.nf'
+include { SUBSAMPLE                          } from './modules/subsample.nf'
 include { ANALYSIS_DMS                       } from './modules/analysis_dms.nf'
 include { SAMTOOLS_STATS as SAMTOOLS_STATS_1 } from './modules/samtools_stats.nf'
 include { SAMTOOLS_STATS as SAMTOOLS_STATS_2 } from './modules/samtools_stats.nf'
@@ -28,7 +29,13 @@ workflow dms {
     SAMTOOLS_STATS_1(ALIGN_SORT.out.bam, 'aligned')
     multiqc_files_ch = multiqc_files_ch.mix(SAMTOOLS_STATS_1.out.stats)
 
-    ANALYSIS_DMS(ALIGN_SORT.out.bam.combine(wt_sequence_ch))
+    if(params.subsample) {
+        SUBSAMPLE(ALIGN_SORT.out.bam)
+        ANALYSIS_DMS(SUBSAMPLE.out.bam.combine(wt_sequence_ch))
+    } else {
+        ANALYSIS_DMS(ALIGN_SORT.out.bam.combine(wt_sequence_ch))
+    }
+
     SAMTOOLS_STATS_2(ANALYSIS_DMS.out.bam, 'dms')
     multiqc_files_ch = multiqc_files_ch.mix(SAMTOOLS_STATS_2.out.stats)
 

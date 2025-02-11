@@ -1,7 +1,4 @@
 process ALIGN_SORT {
-    cpus 8
-    memory '8 GB'
-    time '1h'
     conda "bioconda::bwa=0.7.18 bioconda::samtools=1.20"
     tag "$sample_id"
 
