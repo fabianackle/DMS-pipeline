@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 nextflow run main.nf \
+    -resume \
     -profile local \
     -with-report \
     -with-timeline \
