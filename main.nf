@@ -1,14 +1,13 @@
 #!/usr/bin/env nextflow
 
 /* Processes */
-include { REMOVE_ADAPTER                     } from './modules/remove_adapter.nf'
-include { FASTQC                             } from './modules/fastqc.nf'
-include { ALIGN_SORT                         } from './modules/align_sort.nf'
-include { SUBSAMPLE                          } from './modules/subsample.nf'
-include { ANALYSIS_DMS                       } from './modules/analysis_dms.nf'
-include { SAMTOOLS_STATS as SAMTOOLS_STATS_1 } from './modules/samtools_stats.nf'
-include { SAMTOOLS_STATS as SAMTOOLS_STATS_2 } from './modules/samtools_stats.nf'
-include { MULTIQC                            } from './modules/multiqc.nf'
+include { REMOVE_ADAPTER } from './modules/remove_adapter.nf'
+include { COUNT_CODONS   } from './modules/count_codons.nf'
+include { FASTQC         } from './modules/fastqc.nf'
+include { ALIGN_SORT     } from './modules/align_sort.nf'
+include { SUBSAMPLE      } from './modules/subsample.nf'
+include { SAMTOOLS_STATS } from './modules/samtools_stats.nf'
+include { MULTIQC        } from './modules/multiqc.nf'
 
 /* Workflows */
 workflow dms {
@@ -26,18 +25,15 @@ workflow dms {
     multiqc_files_ch = multiqc_files_ch.mix(REMOVE_ADAPTER.out.log)
 
     ALIGN_SORT(REMOVE_ADAPTER.out.cut.combine(wt_sequence_ch))
-    SAMTOOLS_STATS_1(ALIGN_SORT.out.bam, 'aligned')
-    multiqc_files_ch = multiqc_files_ch.mix(SAMTOOLS_STATS_1.out.stats)
+    SAMTOOLS_STATS(ALIGN_SORT.out.bam, 'aligned')
+    multiqc_files_ch = multiqc_files_ch.mix(SAMTOOLS_STATS.out.stats)
 
     if(params.subsample) {
         SUBSAMPLE(ALIGN_SORT.out.bam)
-        ANALYSIS_DMS(SUBSAMPLE.out.bam.combine(wt_sequence_ch))
+        COUNT_CODONS(SUBSAMPLE.out.bam.combine(wt_sequence_ch))
     } else {
-        ANALYSIS_DMS(ALIGN_SORT.out.bam.combine(wt_sequence_ch))
+        COUNT_CODONS(ALIGN_SORT.out.bam.combine(wt_sequence_ch))
     }
-
-    SAMTOOLS_STATS_2(ANALYSIS_DMS.out.bam, 'dms')
-    multiqc_files_ch = multiqc_files_ch.mix(SAMTOOLS_STATS_2.out.stats)
 
     multiqc_files_ch = multiqc_files_ch.collect()
     MULTIQC(multiqc_files_ch, multiqc_config_ch)    

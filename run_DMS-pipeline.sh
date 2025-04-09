@@ -6,4 +6,4 @@ nextflow run main.nf \
     -with-report \
     -with-timeline \
     -params-file LmrCD.json \
-    --subsample True
+    --subsample False
