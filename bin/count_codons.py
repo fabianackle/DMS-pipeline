@@ -40,15 +40,22 @@ def count_codons_for_pos(bam, ref_name, position):
             continue
 
         codon_bases = []
+        codon_qualities = []
         for ref_pos in range(start, end):
-            read_pos = read.get_reference_positions(full_length=True).index(ref_pos) if ref_pos in read.get_reference_positions() else -1
+            if ref_pos in read.get_reference_positions():
+                read_pos = read.get_reference_positions(full_length=True).index(ref_pos)
+            else:
+                read_pos = -1
+
             if read_pos != -1:
                 codon_bases.append(read.query_sequence[read_pos])
+                codon_qualities.append(int(read.query_qualities[read_pos]))
             else:
                 codon_bases.append("N")
 
-        if "N" not in codon_bases:
-            codons.append("".join(codon_bases))
+        if ("N" not in codon_bases) and all(q >= 35 for q in codon_qualities):
+            codon = "".join(codon_bases)
+            codons.append(codon)
 
     samfile.close()
 
