@@ -1,3 +1,8 @@
+
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15632263.svg)](https://doi.org/10.5281/zenodo.15632263)
+
+
 # DMS-pipeline
 DMS-pipeline is a Nextflow pipeline for processing deep mutational scanning (DMS) data. This pipeline implements the sample processing and analysis by [Gianmarco Meier et al.](https://www.nature.com/articles/s41589-022-01205-1) For the original code, please see Gianmarco's repo [DMS_ABC](https://github.com/giameier/DMS_ABC).
 
