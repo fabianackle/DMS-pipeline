@@ -1,0 +1,30 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: DMS-pipeline
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - orcid: 'https://orcid.org/0000-0002-7199-5004'
+    given-names: Fabian
+    family-names: Ackle
+    affiliation: University of Zurich
+  - given-names: Gianmarco
+    family-names: Meier
+    affiliation: University of Zurich
+    orcid: 'https://orcid.org/0000-0002-4455-430X'
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.15632263
+    description: This is the archived snapshot of v1.0.0 on zenodo
+repository-code: 'https://github.com/fabianackle/DMS-pipeline'
+abstract: 'Deep Mutational Scanning (DMS) analysis pipeline.'
+keywords:
+  - Deep mutational scanning
+license: MIT
+commit: 07678a11d6f262e9a6fa66c389605a062928f306
+version: 1.0.0
+date-released: '2025-06-10'
