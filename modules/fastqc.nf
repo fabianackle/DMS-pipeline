@@ -1,16 +1,16 @@
 process FASTQC {
     conda "bioconda::fastqc=0.12.1"
-    tag "$sample_id"
+    tag "${sample_id}"
 
     input:
     tuple val(sample_id), path(reads)
 
     output:
-    path("*.{html,zip}"), emit: stats
+    path ("*.{html,zip}"), emit: stats
 
     script:
     """
-    fastqc --threads $task.cpus \
+    fastqc --threads ${task.cpus} \
         ${reads[0]} ${reads[1]}
     """
 

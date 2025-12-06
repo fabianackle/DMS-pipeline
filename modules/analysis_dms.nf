@@ -1,6 +1,6 @@
 process ANALYSIS_DMS {
     conda "DMS_ABC.yml"
-    tag "$sample_id"
+    tag "${sample_id}"
 
     publishDir params.outdir, mode: 'copy', pattern: "*.{csv,txt}"
 
@@ -8,10 +8,10 @@ process ANALYSIS_DMS {
     tuple val(sample_id), path(bam), path(wt_sequence)
 
     output:
-    path("${sample_id}_triplet_count.txt_readingframe_{1,2}_HDF5.csv"), emit: counts_readingframe
-    path("${sample_id}_triplet_count.txt"), emit: counts
+    path ("${sample_id}_triplet_count.txt_readingframe_{1,2}_HDF5.csv"), emit: counts_readingframe
+    path ("${sample_id}_triplet_count.txt"), emit: counts
     tuple val(sample_id), path("${sample_id}_codontruncated.bam"), emit: bam
-    
+
     script:
     """
     run_dms_abc.py \

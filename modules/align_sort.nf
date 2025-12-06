@@ -1,6 +1,6 @@
 process ALIGN_SORT {
     conda "bioconda::bwa=0.7.18 bioconda::samtools=1.20"
-    tag "$sample_id"
+    tag "${sample_id}"
 
     input:
     tuple val(sample_id), path(trimmed_sequence_1), path(trimmed_sequence_2), path(wt_sequence)
@@ -10,17 +10,17 @@ process ALIGN_SORT {
 
     script:
     """
-    bwa index $wt_sequence
+    bwa index ${wt_sequence}
 
-    bwa mem -t $task.cpus \
-        $wt_sequence \
-        $trimmed_sequence_1 $trimmed_sequence_2 \
-        | samtools sort -@ $task.cpus \
+    bwa mem -t ${task.cpus} \
+        ${wt_sequence} \
+        ${trimmed_sequence_1} ${trimmed_sequence_2} \
+        | samtools sort -@ ${task.cpus} \
         -o ${sample_id}_adaptor_removed_trimmed.raw.bam
     """
 
     stub:
     """
     touch ${sample_id}_adaptor_removed_trimmed.raw.bam
-    """   
+    """
 }
