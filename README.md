@@ -1,6 +1,6 @@
 
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15632263.svg)](https://doi.org/10.5281/zenodo.15632263)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21030560.svg)](https://doi.org/10.5281/zenodo.21030560)
 
 
 # DMS-pipeline
